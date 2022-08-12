@@ -1,0 +1,123 @@
+<div class="topbar">
+  <h1 class="display-4">Southwind</h1>
+</div>
+
+<h3 class="intro">Welcome to the Southwind App</h3>
+
+<div class="container main-content">
+  <div class="search-toolbar">
+    <label for="toolbar-searrch">Search:</label>
+    <input
+      type="text"
+      autofocus
+      class="form-control"
+      placeholder="Search person"
+      style="width: 205px; display: inline-block; margin-left: 20px"
+      [(ngModel)]="searchKeyword"
+      (input)="filterByKeyword()"
+    />
+  </div>
+
+  <div class="zoom-toolbar">
+    <img
+      (click)="zoomOut()"
+      src="assets/photos/ZoomOut.png"
+      class="zoom-button"
+      height="30"
+    />
+    <img
+      (click)="zoomReset()"
+      src="assets/photos/Zoom1.png"
+      class="zoom-button"
+      height="30"
+    />
+    <img
+      (click)="zoomIn()"
+      src="assets/photos/ZoomIn.png"
+      class="zoom-button"
+      height="30"
+    />
+  </div>
+
+  <div class="svg-wrapper">
+    <svg
+      width="1100"
+      height="720"
+      [style.transform]="'scale(' + zoom / 10 + ')'"
+      (mousewheel)="onSvgMouseWheel($event)"
+    >
+      <!-- connection lines -->
+      <g *ngFor="let rel of relationships">
+        <line
+          class="svg-line"
+          *ngIf="employees && rel"
+          [ngClass]="{ 'svg-line-dashed': isSubManager(rel.type) }"
+          [attr.x1]="getEmployee(rel.employeeId)!.xpos + 50"
+          [attr.y1]="getEmployee(rel.employeeId)!.ypos + 50"
+          [attr.x2]="getEmployee(rel.managerId)!.xpos + 50"
+          [attr.y2]="getEmployee(rel.managerId)!.ypos + 50"
+        ></line>
+      </g>
+
+      <g
+        *ngFor="let employee of employees; let i = index"
+        [ngClass]="{ 'not-searched-result': !employee.highlighted }"
+        [attr.data-index]="i"
+      >
+        <circle
+          [attr.cx]="employee.xpos + 50"
+          [attr.cy]="employee.ypos + 50"
+          class="employee-image"
+          r="52"
+        ></circle>
+
+        <defs>
+          <clipPath id="{{ 'imageClip' + i }}">
+            <circle
+              [attr.cx]="employee.xpos + 50"
+              [attr.cy]="employee.ypos + 50"
+              fill="#FFFFFF"
+              r="50"
+            />
+          </clipPath>
+        </defs>
+
+        <!-- Image of the employee -->
+        <image
+          [attr.xlink:href]="employee.imageUrl"
+          [attr.x]="employee.xpos - 4"
+          [attr.y]="employee.ypos - 4"
+          [attr.clip-path]="'url(#imageClip' + i + ')'"
+          width="110"
+          height="110"
+        />
+
+        <!-- Employee first & last name -->
+        <text
+          [attr.x]="employee.xpos + 50"
+          [attr.y]="employee.ypos + 115"
+          dominant-baseline="middle"
+          class="employee-name"
+          text-anchor="middle"
+          width="400"
+          height="30"
+        >
+          {{ employee.firstName }} {{ employee.lastName }}
+        </text>
+
+        <!-- Employee job -->
+        <text
+          [attr.x]="employee.xpos + 50"
+          [attr.y]="employee.ypos + 132"
+          dominant-baseline="middle"
+          class="employee-job"
+          text-anchor="middle"
+          width="400"
+          height="30"
+        >
+          {{ employee.job }}
+        </text>
+      </g>
+    </svg>
+  </div>
+</div>
